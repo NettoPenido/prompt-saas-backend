@@ -29,6 +29,21 @@ app.get("/prompts", (req, res) => {
   res.json(prompts);
 });
 
+// 👉 Procurar prompts por categoria
+app.get("/prompts/categoria/:categoria", (req, res) => {
+  const categoriaPedida = req.params.categoria;
+
+  const caminhoDoCaderno = path.join(__dirname, "prompts.json");
+  const textoDoCaderno = fs.readFileSync(caminhoDoCaderno, "utf-8");
+  const prompts = JSON.parse(textoDoCaderno);
+
+  const encontrados = prompts.filter(
+    (prompt) => prompt.categoria === categoriaPedida
+  );
+
+  res.json(encontrados);
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
