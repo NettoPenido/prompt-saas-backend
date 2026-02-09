@@ -3,12 +3,14 @@
     "id": 1,
     "titulo": "Prompt para Instagram",
     "categoria": "redes-sociais",
+    "tipo": "gratuito",
     "conteudo": "Crie um post persuasivo para Instagram sobre {{tema}}."
   },
   {
     "id": 2,
     "titulo": "Prompt para Copywriting",
     "categoria": "marketing",
+    "tipo": "pago",
     "conteudo": "Escreva uma copy de vendas usando gatilhos mentais para {{produto}}."
   }
 ]
