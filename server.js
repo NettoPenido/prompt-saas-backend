@@ -16,11 +16,11 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.json({
     status: "OK",
-    message: "O robô está vivo e sabe ler o caderno 📖🤖"
+    message: "O robô está vivo, lê e escreve no caderno 📖✍️🤖"
   });
 });
 
-// 👉 AQUI o robô abre o caderno e mostra os prompts
+// 👉 Ler TODOS os prompts
 app.get("/prompts", (req, res) => {
   const caminhoDoCaderno = path.join(__dirname, "prompts.json");
   const textoDoCaderno = fs.readFileSync(caminhoDoCaderno, "utf-8");
@@ -44,6 +44,41 @@ app.get("/prompts/categoria/:categoria", (req, res) => {
   res.json(encontrados);
 });
 
+// 👉 ADICIONAR novo prompt (ESCREVER no caderno)
+app.post("/prompts", (req, res) => {
+  const { titulo, categoria, conteudo } = req.body;
+
+  if (!titulo || !categoria || !conteudo) {
+    return res.status(400).json({
+      erro: "Envie titulo, categoria e conteudo"
+    });
+  }
+
+  const caminhoDoCaderno = path.join(__dirname, "prompts.json");
+  const textoDoCaderno = fs.readFileSync(caminhoDoCaderno, "utf-8");
+  const prompts = JSON.parse(textoDoCaderno);
+
+  const novoPrompt = {
+    id: prompts.length + 1,
+    titulo,
+    categoria,
+    conteudo
+  };
+
+  prompts.push(novoPrompt);
+
+  fs.writeFileSync(
+    caminhoDoCaderno,
+    JSON.stringify(prompts, null, 2)
+  );
+
+  res.json({
+    mensagem: "Prompt salvo com sucesso ✍️",
+    prompt: novoPrompt
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+
