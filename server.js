@@ -30,6 +30,30 @@ app.get("/prompts", (req, res) => {
   res.json(prompts);
 });
 
+// 🆓 Prompts gratuitos
+app.get("/prompts/gratuitos", (req, res) => {
+  const caminho = path.join(__dirname, "prompts.json");
+  const prompts = JSON.parse(fs.readFileSync(caminho, "utf-8"));
+
+  const gratuitos = prompts.filter(
+    (p) => p.tipo === "gratuito"
+  );
+
+  res.json(gratuitos);
+});
+
+// 🔒 Prompts pagos
+app.get("/prompts/pagos", (req, res) => {
+  const caminho = path.join(__dirname, "prompts.json");
+  const prompts = JSON.parse(fs.readFileSync(caminho, "utf-8"));
+
+  const pagos = prompts.filter(
+    (p) => p.tipo === "pago"
+  );
+
+  res.json(pagos);
+});
+
 // Filtrar por categoria
 app.get("/prompts/categoria/:categoria", (req, res) => {
   const { categoria } = req.params;
@@ -46,11 +70,11 @@ app.get("/prompts/categoria/:categoria", (req, res) => {
 
 // Adicionar novo prompt
 app.post("/prompts", (req, res) => {
-  const { titulo, categoria, conteudo } = req.body;
+  const { titulo, categoria, conteudo, tipo } = req.body;
 
-  if (!titulo || !categoria || !conteudo) {
+  if (!titulo || !categoria || !conteudo || !tipo) {
     return res.status(400).json({
-      erro: "Envie titulo, categoria e conteudo"
+      erro: "Envie titulo, categoria, tipo e conteudo"
     });
   }
 
@@ -61,6 +85,7 @@ app.post("/prompts", (req, res) => {
     id: prompts.length + 1,
     titulo,
     categoria,
+    tipo,
     conteudo
   };
 
@@ -77,4 +102,5 @@ app.post("/prompts", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+
 
