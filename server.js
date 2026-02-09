@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -6,13 +7,15 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Isso aqui ajuda o robô a saber "onde ele está"
+// Localização do arquivo
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// 🔓 libera acesso externo
+app.use(cors());
 app.use(express.json());
 
-// Página de boas-vindas
+// Página inicial
 app.get("/", (req, res) => {
   res.json({
     status: "OK",
@@ -20,31 +23,28 @@ app.get("/", (req, res) => {
   });
 });
 
-// 👉 Ler TODOS os prompts
+// Ler todos os prompts
 app.get("/prompts", (req, res) => {
-  const caminhoDoCaderno = path.join(__dirname, "prompts.json");
-  const textoDoCaderno = fs.readFileSync(caminhoDoCaderno, "utf-8");
-  const prompts = JSON.parse(textoDoCaderno);
-
+  const caminho = path.join(__dirname, "prompts.json");
+  const prompts = JSON.parse(fs.readFileSync(caminho, "utf-8"));
   res.json(prompts);
 });
 
-// 👉 Procurar prompts por categoria
+// Filtrar por categoria
 app.get("/prompts/categoria/:categoria", (req, res) => {
-  const categoriaPedida = req.params.categoria;
+  const { categoria } = req.params;
 
-  const caminhoDoCaderno = path.join(__dirname, "prompts.json");
-  const textoDoCaderno = fs.readFileSync(caminhoDoCaderno, "utf-8");
-  const prompts = JSON.parse(textoDoCaderno);
+  const caminho = path.join(__dirname, "prompts.json");
+  const prompts = JSON.parse(fs.readFileSync(caminho, "utf-8"));
 
   const encontrados = prompts.filter(
-    (prompt) => prompt.categoria === categoriaPedida
+    (p) => p.categoria === categoria
   );
 
   res.json(encontrados);
 });
 
-// 👉 ADICIONAR novo prompt (ESCREVER no caderno)
+// Adicionar novo prompt
 app.post("/prompts", (req, res) => {
   const { titulo, categoria, conteudo } = req.body;
 
@@ -54,9 +54,8 @@ app.post("/prompts", (req, res) => {
     });
   }
 
-  const caminhoDoCaderno = path.join(__dirname, "prompts.json");
-  const textoDoCaderno = fs.readFileSync(caminhoDoCaderno, "utf-8");
-  const prompts = JSON.parse(textoDoCaderno);
+  const caminho = path.join(__dirname, "prompts.json");
+  const prompts = JSON.parse(fs.readFileSync(caminho, "utf-8"));
 
   const novoPrompt = {
     id: prompts.length + 1,
@@ -67,13 +66,10 @@ app.post("/prompts", (req, res) => {
 
   prompts.push(novoPrompt);
 
-  fs.writeFileSync(
-    caminhoDoCaderno,
-    JSON.stringify(prompts, null, 2)
-  );
+  fs.writeFileSync(caminho, JSON.stringify(prompts, null, 2));
 
   res.json({
-    mensagem: "Prompt salvo com sucesso ✍️",
+    mensagem: "Prompt salvo com sucesso ✨",
     prompt: novoPrompt
   });
 });
